@@ -184,7 +184,7 @@ body::before {
 /* Endpoints grid */
 .endpoints {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
   gap: 0.75rem;
   margin-bottom: 2.5rem;
 }
@@ -232,6 +232,16 @@ body::before {
 .method-badge.post {
   background: rgba(34, 211, 238, 0.12);
   color: var(--accent);
+}
+
+.method-badge.put {
+  background: rgba(251, 191, 36, 0.12);
+  color: var(--warning);
+}
+
+.method-badge.delete {
+  background: rgba(248, 113, 113, 0.12);
+  color: var(--error);
 }
 
 .endpoint-path {
@@ -454,9 +464,23 @@ body::before {
   color: var(--text-muted);
 }
 
-.input-wrapper textarea:focus {
+.input-wrapper textarea:focus,
+.input-wrapper input:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.input-wrapper input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.2s ease;
 }
 
 .btn-send {

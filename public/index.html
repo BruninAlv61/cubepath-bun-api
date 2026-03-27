@@ -38,6 +38,26 @@
         <span class="method-badge post">POST</span>
         <span class="endpoint-path">/chat</span>
       </button>
+      <button class="endpoint-card" id="ep-users-get" onclick="selectEndpoint('users-get')">
+        <span class="method-badge get">GET</span>
+        <span class="endpoint-path">/users</span>
+      </button>
+      <button class="endpoint-card" id="ep-users-get-id" onclick="selectEndpoint('users-get-id')">
+        <span class="method-badge get">GET</span>
+        <span class="endpoint-path">/users/:id</span>
+      </button>
+      <button class="endpoint-card" id="ep-users-post" onclick="selectEndpoint('users-post')">
+        <span class="method-badge post">POST</span>
+        <span class="endpoint-path">/users</span>
+      </button>
+      <button class="endpoint-card" id="ep-users-put" onclick="selectEndpoint('users-put')">
+        <span class="method-badge put">PUT</span>
+        <span class="endpoint-path">/users/:id</span>
+      </button>
+      <button class="endpoint-card" id="ep-users-delete" onclick="selectEndpoint('users-delete')">
+        <span class="method-badge delete">DEL</span>
+        <span class="endpoint-path">/users/:id</span>
+      </button>
     </div>
 
     <!-- Response Panel -->
@@ -59,7 +79,10 @@
       </div>
 
       <div class="input-area" id="input-area">
-        <div class="input-wrapper">
+        <div class="input-wrapper" id="id-wrapper" style="display: none; max-width: 80px;">
+          <input type="text" id="id-input" placeholder="ID" />
+        </div>
+        <div class="input-wrapper" id="body-wrapper">
           <textarea
             id="message-input"
             rows="1"

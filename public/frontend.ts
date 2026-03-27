@@ -1,5 +1,5 @@
 // ── State ──────────────────────────────────────────────
-let currentEndpoint: "health" | "chat" = "chat";
+let currentEndpoint: string = "chat";
 let isStreaming = false;
 let abortController: AbortController | null = null;
 let chatHistory: { role: string; content: string }[] = [];
@@ -8,6 +8,9 @@ let chatHistory: { role: string; content: string }[] = [];
 const responseArea = document.getElementById("response-area") as HTMLDivElement;
 const placeholder = document.getElementById("placeholder") as HTMLDivElement;
 const messageInput = document.getElementById("message-input") as HTMLTextAreaElement;
+const idInput = document.getElementById("id-input") as HTMLInputElement;
+const idWrapper = document.getElementById("id-wrapper") as HTMLDivElement;
+const bodyWrapper = document.getElementById("body-wrapper") as HTMLDivElement;
 const btnSend = document.getElementById("btn-send") as HTMLButtonElement;
 const inputArea = document.getElementById("input-area") as HTMLDivElement;
 const panelTitle = document.getElementById("panel-title") as HTMLSpanElement;
@@ -34,18 +37,42 @@ async function checkHealth() {
 }
 
 // ── Endpoint selection ─────────────────────────────────
-function selectEndpoint(ep: "health" | "chat") {
+function selectEndpoint(ep: string) {
   currentEndpoint = ep;
 
-  document.getElementById("ep-health")!.classList.toggle("active", ep === "health");
-  document.getElementById("ep-chat")!.classList.toggle("active", ep === "chat");
+  const endpoints = ['health', 'chat', 'users-get', 'users-get-id', 'users-post', 'users-put', 'users-delete'];
+  for (const endpoint of endpoints) {
+    document.getElementById(`ep-${endpoint}`)?.classList.toggle("active", ep === endpoint);
+  }
+
+  inputArea.style.display = "flex";
+  idWrapper.style.display = "none";
+  bodyWrapper.style.display = "block";
 
   if (ep === "health") {
     inputArea.style.display = "none";
     panelTitle.textContent = "GET /health";
-  } else {
-    inputArea.style.display = "flex";
+  } else if (ep === "chat") {
     panelTitle.textContent = "POST /chat";
+    messageInput.placeholder = "Escribe tu mensaje…";
+  } else if (ep === "users-get") {
+    inputArea.style.display = "none";
+    panelTitle.textContent = "GET /api/users";
+  } else if (ep === "users-get-id") {
+    idWrapper.style.display = "block";
+    bodyWrapper.style.display = "none";
+    panelTitle.textContent = "GET /api/users/:id";
+  } else if (ep === "users-post") {
+    panelTitle.textContent = "POST /api/users";
+    messageInput.placeholder = '{\n  "name": "Juan",\n  "email": "juan@example.com"\n}';
+  } else if (ep === "users-put") {
+    idWrapper.style.display = "block";
+    panelTitle.textContent = "PUT /api/users/:id";
+    messageInput.placeholder = '{\n  "name": "Juan Modificado"\n}';
+  } else if (ep === "users-delete") {
+    idWrapper.style.display = "block";
+    bodyWrapper.style.display = "none";
+    panelTitle.textContent = "DELETE /api/users/:id";
   }
 
   clearResponse();
@@ -60,8 +87,10 @@ async function sendRequest() {
 
   if (currentEndpoint === "health") {
     await sendHealthRequest();
-  } else {
+  } else if (currentEndpoint === "chat") {
     await sendChatRequest();
+  } else {
+    await sendUsersRequest();
   }
 }
 
@@ -177,6 +206,56 @@ async function sendChatRequest() {
   } finally {
     isStreaming = false;
     abortController = null;
+    setLoading(false);
+  }
+}
+
+async function sendUsersRequest() {
+  const methodMap: Record<string, string> = {
+    "users-get": "GET",
+    "users-get-id": "GET",
+    "users-post": "POST",
+    "users-put": "PUT",
+    "users-delete": "DELETE"
+  };
+  const method = methodMap[currentEndpoint];
+  const idValue = idInput.value.trim();
+  const bodyValue = messageInput.value.trim();
+  
+  let path = "/api/users";
+  
+  if (["users-get-id", "users-put", "users-delete"].includes(currentEndpoint)) {
+    if (!idValue) {
+      renderError("Se requiere un ID para este endpoint.");
+      return;
+    }
+    path += `/${idValue}`;
+  }
+  
+  let options: RequestInit = { method };
+  if (["users-post", "users-put"].includes(currentEndpoint)) {
+    try {
+      if (!bodyValue) throw new Error("Body is empty");
+      JSON.parse(bodyValue); // validate
+      options.headers = { "Content-Type": "application/json" };
+      options.body = bodyValue;
+    } catch (err) {
+      renderError("El body debe ser un JSON válido.");
+      return;
+    }
+  }
+
+  setLoading(true);
+  clearResponseContent();
+  placeholder.style.display = "none";
+
+  try {
+    const res = await fetch(path, options);
+    const data = await res.json();
+    renderJSON(data);
+  } catch (err) {
+    renderError(err instanceof Error ? err.message : "Request failed");
+  } finally {
     setLoading(false);
   }
 }
