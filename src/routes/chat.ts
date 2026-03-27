@@ -1,4 +1,8 @@
-import { openrouter } from "../services/openrouter";
+import { cerebras, CEREBRAS_MODEL } from "../services/cerebras";
+import { groq, GROQ_MODEL } from "../services/groq";
+
+// Variable para el round robin (alternador)
+let useGroqNext = true;
 
 interface ChatRequestBody {
   messages: { role: string; content: string }[];
@@ -15,13 +19,25 @@ export async function handleChat(req: Request): Promise<Response> {
       );
     }
 
-    const stream = await openrouter.chat.send({
-      chatGenerationParams: {
-        model: "openrouter/free",
+    let stream: any;
+    
+    // Implementación Round Robin
+    if (useGroqNext) {
+      stream = await groq.chat.completions.create({
+        model: GROQ_MODEL,
         messages: body.messages as any,
         stream: true,
-      },
-    });
+      });
+    } else {
+      stream = await cerebras.chat.completions.create({
+        model: CEREBRAS_MODEL,
+        messages: body.messages as any,
+        stream: true,
+      });
+    }
+    
+    // Alternamos para la próxima petición
+    useGroqNext = !useGroqNext;
 
     const readable = new ReadableStream({
       async start(controller) {
