@@ -1,15 +1,8 @@
 # cubepath-bun-api
 
-To install dependencies:
+``` APP para utilizar un chat de IA con un Round Robin que te permite cambiar entre open router, groq y cerebras para tener IA de forma ilimitada
 
-```bash
-bun install
-```
+Ademas: un flujo con n8n para enviar mensajes a un servicio externo con eventos de dokploy gracias a un web hook
 
-To run:
+<img width="959" height="424" alt="image" src="https://github.com/user-attachments/assets/96489c18-5eb7-4689-a88b-317c6742cff3" />
 
-```bash
-bun run index.ts
-```
-
-This project was created using `bun init` in bun v1.3.11. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
