@@ -1,6 +1,6 @@
 # cubepath-bun-api
 
-``` APP para utilizar un chat de IA con un Round Robin que te permite cambiar entre open router, groq y cerebras para tener IA de forma ilimitada
+APP para utilizar un chat de IA con un Round Robin que te permite cambiar entre open router, groq y cerebras para tener IA de forma ilimitada
 
 Ademas: un flujo con n8n para enviar mensajes a un servicio externo con eventos de dokploy gracias a un web hook
 
